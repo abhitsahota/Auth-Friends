@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { axiosAuth } from '../utils/axiosAuth'
+import axios from 'axios'
 
 export const Friend = () => {
 
@@ -10,6 +11,8 @@ export const Friend = () => {
     })
 
     const [ data, setData ] = useState([])
+
+    const [ newName, setNewName ] = useState('')
     
     useEffect(() => {
         axiosAuth()
@@ -44,6 +47,26 @@ export const Friend = () => {
         window.location.reload();
     }
 
+    const deleteFriend = (props) => {
+        console.log(props)
+        axiosAuth()
+        .delete(`/friends/${props}`)
+        window.location.reload()
+    }
+
+    const handleEdit = e => {
+        setNewName(e.target.value)
+    }
+
+    const submitEdit = (e, props) => {
+        e.preventDefault()
+        console.log(props)
+        axiosAuth
+        .put(`/friends/${props}`, { name: newName })
+        setNewName('')
+        // window.location.reload()
+    }
+
     return (
         <div>
             <form onSubmit={handleSubmit}>
@@ -74,7 +97,22 @@ export const Friend = () => {
             <ul>
                 {data.map(friend => {
                     return (
-                        <li key={friend.id}>{friend.name}</li>
+                        <div key={friend.id}>
+                            <li>{friend.name}</li>
+                            <button onClick={() => deleteFriend(friend.id)}>Delete</button>
+                            <form onSubmit={(e) => submitEdit(e, friend.id)}>
+                                <input 
+                                    type='text'
+                                    name='name'
+                                    value={newName}
+                                    onChange={handleEdit}
+                                />
+                                <button>Edit</button>
+                            </form> 
+                            <br />
+                            <br />
+                            <br />
+                        </div>
                     )
                 })}
             </ul>
